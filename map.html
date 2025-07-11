@@ -1,9 +1,109 @@
 <!DOCTYPE html>
 <html lang="en">
-<head><meta charset="UTF-8"><title>Mapa</title></head>
-<body style="background:#e6f0ff; font-family:sans-serif;">
-  <h2>Mapa BAY (demo)</h2>
-  <p>Zde bude interaktivní mapa s rezervacemi</p>
-  <a href="export.html">Export rezervací</a> | <a href="index.html">Odhlásit se</a>
+<head>
+  <meta charset="UTF-8">
+  <title>Mapa BAY</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      background-color: #e6f0ff;
+      margin: 0;
+      padding: 20px;
+    }
+    h2 {
+      margin-bottom: 10px;
+    }
+    .controls {
+      margin-bottom: 20px;
+    }
+    .controls input {
+      margin-right: 10px;
+    }
+    .yard {
+      display: grid;
+      grid-template-columns: repeat(6, 100px);
+      grid-template-rows: repeat(4, 80px);
+      gap: 10px;
+      justify-content: start;
+    }
+    .bay {
+      background-color: lightgreen;
+      border: 2px solid #444;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .bay.booked {
+      background-color: #f88;
+    }
+    .info {
+      margin-top: 20px;
+    }
+    .hidden {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <h2>Interaktivní mapa BAY</h2>
+  <div class="controls">
+    <label>Datum: <input type="date" id="datePicker"></label>
+    <button onclick="searchAvailability()">Zkontrolovat dostupnost</button>
+  </div>
+
+  <div class="yard" id="yard">
+    <div class="bay" id="bay1">Bay 1</div>
+    <div class="bay" id="bay2">Bay 2</div>
+    <div class="bay" id="bay3">Bay 3</div>
+    <div class="bay" id="bay4">Bay 4</div>
+    <div class="bay" id="bay5">Bay 5</div>
+    <div></div>
+    <div></div><div></div><div></div><div></div><div></div><div></div>
+    <div></div><div></div><div></div><div></div><div></div><div class="bay" id="bay7">Bay 7</div>
+  </div>
+
+  <div class="info hidden" id="bayInfo">
+    <h3>Detaily rezervace</h3>
+    <p id="infoText"></p>
+  </div>
+
+  <script>
+    const reservations = {
+      '2025-07-15': {
+        bay2: { contractor: 'Firma X', until: '18:00', item: 'Stroj A' },
+        bay4: { contractor: 'Firma Y', until: '22:00', item: 'Skip B' },
+        bay7: { contractor: 'Firma Z', until: '20:00', item: 'Dodávka C' }
+      },
+      '2025-07-16': {
+        bay1: { contractor: 'Firma A', until: '17:00', item: 'Kontejner D' },
+        bay3: { contractor: 'Firma B', until: '19:00', item: 'Stroj E' }
+      }
+    };
+
+    function searchAvailability() {
+      const selectedDate = document.getElementById('datePicker').value;
+      const bays = document.querySelectorAll('.bay');
+      bays.forEach(bay => {
+        bay.classList.remove('booked');
+        bay.onclick = () => showInfo(null);
+        if (reservations[selectedDate] && reservations[selectedDate][bay.id]) {
+          bay.classList.add('booked');
+          bay.onclick = () => showInfo(reservations[selectedDate][bay.id]);
+        }
+      });
+    }
+
+    function showInfo(data) {
+      const infoBox = document.getElementById('bayInfo');
+      if (data) {
+        document.getElementById('infoText').innerText = `Rezervováno pro: ${data.contractor}\nPředmět: ${data.item}\nDo: ${data.until}`;
+        infoBox.classList.remove('hidden');
+      } else {
+        infoBox.classList.add('hidden');
+      }
+    }
+  </script>
 </body>
 </html>
